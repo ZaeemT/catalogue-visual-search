@@ -3,6 +3,13 @@
 Upload a photo of a clothing item, get back visually similar products from a
 384,022-image catalogue, each with a plain-English reason for why it matched.
 
+## Demo
+
+
+https://github.com/user-attachments/assets/b01ea7df-7d25-4e32-a8b8-88ef2e0dd349
+
+
+
 ```
 curl -X POST http://127.0.0.1:8000/search/ \
   -F "image=@data/queries/images/000009.jpg" \
