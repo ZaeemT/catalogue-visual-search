@@ -1,0 +1,74 @@
+{
+  "model": "clip-vit-b32",
+  "dim": 512,
+  "top_k": 10,
+  "queries": 20,
+  "repeats": 50,
+  "fit": {
+    "ms_per_million_items": 54.1442,
+    "intercept_ms": -0.094,
+    "r_squared": 0.99988
+  },
+  "extrapolation": {
+    "1M_items_ms": 54.05,
+    "2M_items_ms": 108.19
+  },
+  "measurements": [
+    {
+      "catalogue_size": 1000,
+      "median_ms": 0.0317,
+      "p95_ms": 0.0377,
+      "ms_per_1k_items": 0.03171,
+      "memory_mb": 2.0,
+      "samples": 1000
+    },
+    {
+      "catalogue_size": 10000,
+      "median_ms": 0.3652,
+      "p95_ms": 0.4017,
+      "ms_per_1k_items": 0.03652,
+      "memory_mb": 20.5,
+      "samples": 1000
+    },
+    {
+      "catalogue_size": 50000,
+      "median_ms": 2.5561,
+      "p95_ms": 2.7482,
+      "ms_per_1k_items": 0.05112,
+      "memory_mb": 102.4,
+      "samples": 1000
+    },
+    {
+      "catalogue_size": 100000,
+      "median_ms": 5.32,
+      "p95_ms": 5.6914,
+      "ms_per_1k_items": 0.0532,
+      "memory_mb": 204.8,
+      "samples": 1000
+    },
+    {
+      "catalogue_size": 200000,
+      "median_ms": 10.892,
+      "p95_ms": 11.7053,
+      "ms_per_1k_items": 0.05446,
+      "memory_mb": 409.6,
+      "samples": 1000
+    },
+    {
+      "catalogue_size": 300000,
+      "median_ms": 16.074,
+      "p95_ms": 17.2318,
+      "ms_per_1k_items": 0.05358,
+      "memory_mb": 614.4,
+      "samples": 1000
+    },
+    {
+      "catalogue_size": 384022,
+      "median_ms": 20.6851,
+      "p95_ms": 22.915,
+      "ms_per_1k_items": 0.05386,
+      "memory_mb": 786.5,
+      "samples": 1000
+    }
+  ]
+}

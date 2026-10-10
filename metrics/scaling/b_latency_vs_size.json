@@ -1,0 +1,74 @@
+{
+  "model": "marqo-fashionclip",
+  "dim": 512,
+  "top_k": 10,
+  "queries": 20,
+  "repeats": 50,
+  "fit": {
+    "ms_per_million_items": 54.1177,
+    "intercept_ms": -0.0824,
+    "r_squared": 0.99984
+  },
+  "extrapolation": {
+    "1M_items_ms": 54.04,
+    "2M_items_ms": 108.15
+  },
+  "measurements": [
+    {
+      "catalogue_size": 1000,
+      "median_ms": 0.0311,
+      "p95_ms": 0.0362,
+      "ms_per_1k_items": 0.03113,
+      "memory_mb": 2.0,
+      "samples": 1000
+    },
+    {
+      "catalogue_size": 10000,
+      "median_ms": 0.413,
+      "p95_ms": 0.5257,
+      "ms_per_1k_items": 0.0413,
+      "memory_mb": 20.5,
+      "samples": 1000
+    },
+    {
+      "catalogue_size": 50000,
+      "median_ms": 2.6919,
+      "p95_ms": 2.8924,
+      "ms_per_1k_items": 0.05384,
+      "memory_mb": 102.4,
+      "samples": 1000
+    },
+    {
+      "catalogue_size": 100000,
+      "median_ms": 5.3114,
+      "p95_ms": 5.6903,
+      "ms_per_1k_items": 0.05311,
+      "memory_mb": 204.8,
+      "samples": 1000
+    },
+    {
+      "catalogue_size": 200000,
+      "median_ms": 10.6896,
+      "p95_ms": 11.2458,
+      "ms_per_1k_items": 0.05345,
+      "memory_mb": 409.6,
+      "samples": 1000
+    },
+    {
+      "catalogue_size": 300000,
+      "median_ms": 15.9874,
+      "p95_ms": 17.026,
+      "ms_per_1k_items": 0.05329,
+      "memory_mb": 614.4,
+      "samples": 1000
+    },
+    {
+      "catalogue_size": 384022,
+      "median_ms": 20.8529,
+      "p95_ms": 22.142,
+      "ms_per_1k_items": 0.0543,
+      "memory_mb": 786.5,
+      "samples": 1000
+    }
+  ]
+}
