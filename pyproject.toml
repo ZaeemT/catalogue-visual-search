@@ -1,7 +1,7 @@
 [project]
-name = "my-fastapi-boilerplate"
+name = "catalogue-visual-search"
 version = "0.1.0"
-description = "Add your description here"
+description = "Visual search over ~400,000-image fashion catalogue — upload a photo, get visually similar products with plain-English explanations. FastAPI, CLIP-style embeddings, ~23 ms search."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

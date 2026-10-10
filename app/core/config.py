@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     Application settings loaded from environment variables
     """
 
-    APP_NAME: str = "my-fastAPI-boilerplate"
+    APP_NAME: str = "Catalogue Visual Search"
     APP_VERSION: str = "0.1.0"
 
     # MongoDB configuration

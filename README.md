@@ -1,4 +1,4 @@
-# Visual Search
+# Catalogue Visual Search
 
 Upload a photo of a clothing item, get back visually similar products from a
 384,022-image catalogue, each with a plain-English reason for why it matched.
