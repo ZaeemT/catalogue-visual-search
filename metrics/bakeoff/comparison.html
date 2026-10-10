@@ -1,0 +1,1889 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Visual Search — Model Comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Karla:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bone:#F4F1E8;--paper:#FBFAF6;--ink:#1A1713;--ash:#6E6960;--line:#DDD7C9;--red:#C2412B;
+--m-clip-vit-b32:#2F5C8A;--m-marqo-fashionclip:#8C4A7D;--m-marqo-fashionsiglip:#C2412B;
+--serif:'Fraunces',Georgia,serif;--sans:'Karla',-apple-system,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bone);color:var(--ink);font:400 15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E")}
+.wrap{max-width:1340px;margin:0 auto;padding:0 clamp(16px,4vw,56px)}
+.mast{padding:clamp(40px,7vw,92px) 0 clamp(26px,3vw,38px)}
+.kicker{display:flex;align-items:center;gap:13px;margin:0;color:var(--red);
+font:600 10px/1 var(--mono);letter-spacing:.24em;text-transform:uppercase;animation:rise .7s both}
+.kicker::after{content:'';height:1px;flex:1;background:var(--line)}
+h1{margin:24px 0 0;font:300 clamp(44px,8.6vw,106px)/.93 var(--serif);
+font-variation-settings:'opsz' 144;letter-spacing:-.028em;animation:rise .7s .06s both}
+h1 em{font-style:italic;font-weight:400;color:var(--red)}
+.lede{max-width:60ch;margin:26px 0 0;font-size:17px;line-height:1.6;color:var(--ash);animation:rise .7s .12s both}
+.facts{display:flex;flex-wrap:wrap;gap:0 clamp(28px,4vw,52px);margin:36px 0 0;animation:rise .7s .18s both}
+.facts div{padding-top:11px;border-top:2px solid var(--ink)}
+.facts dt{font:600 9px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ash)}
+.facts dd{margin:8px 0 0;font:300 clamp(24px,3vw,32px)/1 var(--serif)}
+.tie{margin:30px 0 0;padding:13px 17px;border-left:2px solid var(--red);background:var(--paper);
+font-size:13.5px;color:var(--ash);max-width:70ch;animation:rise .7s .2s both}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(262px,1fr));gap:1px;
+background:var(--line);border:1px solid var(--line);margin:clamp(34px,5vw,58px) 0 0}
+.mcard{background:var(--paper);padding:26px 24px 24px;position:relative;
+animation:rise .6s both;animation-delay:calc(.24s + var(--i)*.08s)}
+.mcard.is-best{background:#fff}
+.mcard.is-best::before{content:'';position:absolute;inset:0 0 auto;height:2px;background:var(--red)}
+.mcard header{display:flex;align-items:center;gap:9px;margin-bottom:18px}
+.mcard h3{margin:0;font:600 12px/1 var(--mono)}
+.lead{margin-left:auto;padding:3px 7px;background:var(--red);color:#fff;
+font:600 8px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--ink)}
+.dot[data-m=clip-vit-b32]{background:var(--m-clip-vit-b32)}
+.dot[data-m=marqo-fashionclip]{background:var(--m-marqo-fashionclip)}
+.dot[data-m=marqo-fashionsiglip]{background:var(--m-marqo-fashionsiglip)}
+.pct{margin:0;font:300 clamp(52px,6vw,66px)/.85 var(--serif);letter-spacing:-.03em}
+.pct small{font-size:.34em;margin-left:2px;color:var(--ash)}
+.pctl{margin:11px 0 0;font-size:12.5px;line-height:1.4;color:var(--ash);max-width:30ch}
+.meter{height:3px;background:var(--line);margin:18px 0 20px}
+.meter span{display:block;height:100%;background:var(--red);transform-origin:left;
+animation:grow 1.1s .55s cubic-bezier(.2,.8,.3,1) both}
+.mcard dl{margin:0;display:grid;gap:9px}
+.mcard dl div{display:flex;justify-content:space-between;gap:14px;align-items:baseline}
+.mcard dt{font-size:12.5px;color:var(--ash)}
+.mcard dd{margin:0;font:400 12.5px/1 var(--mono)}
+.bar-top{position:sticky;top:0;z-index:8;margin:clamp(34px,5vw,56px) 0 0;padding:13px 0;
+background:color-mix(in srgb,var(--bone) 86%,transparent);backdrop-filter:blur(14px);
+border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.bar-top .wrap{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+.bar-label{font:600 9px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ash)}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 15px;border:1px solid var(--line);
+background:transparent;border-radius:999px;font:400 13px var(--sans);color:var(--ash);cursor:pointer;
+transition:.22s cubic-bezier(.2,.8,.3,1)}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip.is-on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.chip:not(.is-on) .dot{opacity:.3}
+.count{margin-left:auto;font:400 11.5px var(--mono);color:var(--ash)}
+.q{display:grid;grid-template-columns:234px 1fr;gap:clamp(22px,3.4vw,50px);
+padding:clamp(32px,4vw,50px) 0;border-bottom:1px solid var(--line)}
+.qside{position:sticky;top:78px;align-self:start}
+.qnum{display:block;margin-bottom:12px;font:400 11px/1 var(--mono);letter-spacing:.14em;color:var(--red)}
+.qframe{position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--paper);border:1px solid var(--line)}
+.qframe::after{content:'';position:absolute;inset:0;box-shadow:inset 0 0 0 2px var(--red);pointer-events:none}
+.qframe img,.frame img{width:100%;height:100%;object-fit:cover;display:block}
+.qcat{margin:15px 0 9px;font:300 23px/1.15 var(--serif);letter-spacing:-.012em}
+.qmeta{margin:13px 0 0;font:600 9px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ash)}
+.row{margin-bottom:28px}
+.row:last-child{margin-bottom:0}
+.row[hidden]{display:none}
+.row h4{display:flex;align-items:center;gap:9px;margin:0 0 13px;
+font:600 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ash)}
+.row h4::after{content:'';height:1px;flex:1;background:var(--line)}
+.strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(144px,1fr));gap:13px}
+.card{margin:0;background:var(--paper);border:1px solid var(--line);
+transition:.3s cubic-bezier(.2,.8,.3,1)}
+.card:hover{transform:translateY(-5px);border-color:var(--ink);box-shadow:0 16px 30px -18px rgba(26,23,19,.45)}
+.frame{position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--bone)}
+.frame img{transition:transform .55s cubic-bezier(.2,.8,.3,1)}
+.card:hover .frame img{transform:scale(1.05)}
+.score{position:absolute;left:0;bottom:0;padding:4px 8px;background:var(--ink);color:var(--paper);
+font:400 10.5px/1 var(--mono)}
+.tag{position:absolute;top:7px;right:7px;padding:3px 7px;background:var(--red);color:#fff;
+font:600 7.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.card figcaption{padding:10px 10px 8px}
+.cat{margin:0 0 7px;font-size:12.5px;line-height:1.3;min-height:2.6em;overflow:hidden;
+display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.sws{display:flex;gap:4px}
+.sw{width:11px;height:11px;border-radius:50%;background:var(--c);border:1px solid rgba(26,23,19,.17)}
+.bar{height:2px;background:var(--line)}
+.bar span{display:block;height:100%;background:var(--ink)}
+.card.is-hit .bar span{background:var(--red)}
+footer{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+padding:32px 0 60px;font:400 11.5px var(--mono);color:var(--ash)}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media(max-width:860px){
+.q{grid-template-columns:1fr}
+.qside{position:static;display:grid;grid-template-columns:116px 1fr;gap:16px;align-items:end}
+.qnum{grid-column:1/-1;margin:0}
+.qcat{margin-top:0}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+
+<header class="mast"><div class="wrap">
+<p class="kicker">Visual search · model evaluation</p>
+<h1>Which model<br>sees it <em>our way?</em></h1>
+<p class="lede">Three pretrained image encoders, one catalogue, the same twenty held-out
+photographs. Every row below is a real retrieval — the uploaded photo on the left, each
+model's five closest catalogue items beside it.</p>
+<dl class="facts">
+<div><dt>Catalogue</dt><dd>10,000</dd></div>
+<div><dt>Test queries</dt><dd>20</dd></div>
+<div><dt>Models</dt><dd>3</dd></div>
+<div><dt>Search</dt><dd>Exact</dd></div>
+</dl>
+
+<div class="cards"><article class="mcard" style="--i:0">
+  <header><span class="dot" data-m="clip-vit-b32"></span><h3>clip-vit-b32</h3>
+  </header>
+  <p class="pct">70<small>%</small></p>
+  <p class="pctl">queries whose own category appeared in the top five</p>
+  <div class="meter"><span style="width:70%"></span></div>
+  <dl><div><dt>Vector size</dt><dd>512</dd></div>
+      <div><dt>Index build</dt><dd>44.8s</dd></div>
+      <div><dt>Query latency</dt><dd>0.45 ms</dd></div></dl>
+</article>
+<article class="mcard is-best" style="--i:1">
+  <header><span class="dot" data-m="marqo-fashionclip"></span><h3>marqo-fashionclip</h3>
+  <b class="lead">strongest</b></header>
+  <p class="pct">80<small>%</small></p>
+  <p class="pctl">queries whose own category appeared in the top five</p>
+  <div class="meter"><span style="width:80%"></span></div>
+  <dl><div><dt>Vector size</dt><dd>512</dd></div>
+      <div><dt>Index build</dt><dd>103.6s</dd></div>
+      <div><dt>Query latency</dt><dd>0.16 ms</dd></div></dl>
+</article>
+<article class="mcard" style="--i:2">
+  <header><span class="dot" data-m="marqo-fashionsiglip"></span><h3>marqo-fashionsiglip</h3>
+  </header>
+  <p class="pct">75<small>%</small></p>
+  <p class="pctl">queries whose own category appeared in the top five</p>
+  <div class="meter"><span style="width:75%"></span></div>
+  <dl><div><dt>Vector size</dt><dd>768</dd></div>
+      <div><dt>Index build</dt><dd>109.2s</dd></div>
+      <div><dt>Query latency</dt><dd>0.25 ms</dd></div></dl>
+</article></div>
+</div></header>
+
+<div class="bar-top"><div class="wrap">
+<span class="bar-label">Compare</span><div class="chips"><button class="chip is-on" data-model="clip-vit-b32" aria-pressed="true">
+  <span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</button>
+<button class="chip is-on" data-model="marqo-fashionclip" aria-pressed="true">
+  <span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</button>
+<button class="chip is-on" data-model="marqo-fashionsiglip" aria-pressed="true">
+  <span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</button></div>
+<span class="count" id="count"></span></div></div>
+
+<main class="wrap"><article class="q" id="q0">
+  <div class="qside"><span class="qnum">01 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000000.jpg" alt="query photo"></div>
+    <p class="qcat">платье</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008211.jpg" alt="платье">
+  <b class="tag">same type</b><span class="score">0.889</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#7A5A8C' title='фиолетовый'></i></div></figcaption>
+  <div class="bar"><span style="width:88.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008427.jpg" alt="Платье">
+  <b class="tag">same type</b><span class="score">0.880</span></div>
+  <figcaption><p class="cat">Платье</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:88.0%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001344.jpg" alt="платье">
+  <b class="tag">same type</b><span class="score">0.880</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:88.0%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001778.jpg" alt="Туника">
+  <span class="score">0.875</span></div>
+  <figcaption><p class="cat">Туника</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:87.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009789.jpg" alt="летнее платье">
+  <span class="score">0.870</span></div>
+  <figcaption><p class="cat">летнее платье</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.0%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006657.jpg" alt="платье">
+  <b class="tag">same type</b><span class="score">0.757</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:75.7%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006702.jpg" alt="Длинное платье">
+  <span class="score">0.684</span></div>
+  <figcaption><p class="cat">Длинное платье</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:68.4%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006035.jpg" alt="платье">
+  <b class="tag">same type</b><span class="score">0.677</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i></div></figcaption>
+  <div class="bar"><span style="width:67.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004313.jpg" alt="платье">
+  <b class="tag">same type</b><span class="score">0.668</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:66.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006904.jpg" alt="платье">
+  <b class="tag">same type</b><span class="score">0.664</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#D4762B' title='оранжевый'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:66.4%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006904.jpg" alt="платье">
+  <b class="tag">same type</b><span class="score">0.779</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#D4762B' title='оранжевый'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:77.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006657.jpg" alt="платье">
+  <b class="tag">same type</b><span class="score">0.777</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:77.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009018.jpg" alt="Платье">
+  <b class="tag">same type</b><span class="score">0.741</span></div>
+  <figcaption><p class="cat">Платье</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#7A5A8C' title='фиолетовый'></i></div></figcaption>
+  <div class="bar"><span style="width:74.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006035.jpg" alt="платье">
+  <b class="tag">same type</b><span class="score">0.737</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i></div></figcaption>
+  <div class="bar"><span style="width:73.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004313.jpg" alt="платье">
+  <b class="tag">same type</b><span class="score">0.731</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:73.1%"></span></div></figure></div></section></div></article><article class="q" id="q1">
+  <div class="qside"><span class="qnum">02 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000001.jpg" alt="query photo"></div>
+    <p class="qcat">бутылка масла арганы</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006908.jpg" alt="Бутылка с льняным маслом">
+  <span class="score">0.816</span></div>
+  <figcaption><p class="cat">Бутылка с льняным маслом</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.6%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004996.jpg" alt="Оливковое масло">
+  <span class="score">0.783</span></div>
+  <figcaption><p class="cat">Оливковое масло</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:78.3%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003580.jpg" alt="Эфирное масло">
+  <span class="score">0.775</span></div>
+  <figcaption><p class="cat">Эфирное масло</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:77.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000632.jpg" alt="Флакон с маслом из семян лука">
+  <span class="score">0.768</span></div>
+  <figcaption><p class="cat">Флакон с маслом из семян лука</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:76.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009588.jpg" alt="Масло черного касторового дерева">
+  <span class="score">0.761</span></div>
+  <figcaption><p class="cat">Масло черного касторового дерева</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:76.1%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003330.jpg" alt="масло арганы">
+  <span class="score">0.676</span></div>
+  <figcaption><p class="cat">масло арганы</p><div class="sws"><i class='sw' style='--c:#B9B5AC' title='другой'></i></div></figcaption>
+  <div class="bar"><span style="width:67.6%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002490.jpg" alt="аргановое масло">
+  <span class="score">0.654</span></div>
+  <figcaption><p class="cat">аргановое масло</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:65.4%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003580.jpg" alt="Эфирное масло">
+  <span class="score">0.618</span></div>
+  <figcaption><p class="cat">Эфирное масло</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:61.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009588.jpg" alt="Масло черного касторового дерева">
+  <span class="score">0.594</span></div>
+  <figcaption><p class="cat">Масло черного касторового дерева</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:59.4%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004775.jpg" alt="Эфирное масло аниса">
+  <span class="score">0.587</span></div>
+  <figcaption><p class="cat">Эфирное масло аниса</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:58.7%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002490.jpg" alt="аргановое масло">
+  <span class="score">0.708</span></div>
+  <figcaption><p class="cat">аргановое масло</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:70.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006908.jpg" alt="Бутылка с льняным маслом">
+  <span class="score">0.682</span></div>
+  <figcaption><p class="cat">Бутылка с льняным маслом</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:68.2%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007036.jpg" alt="Оливковое масло">
+  <span class="score">0.675</span></div>
+  <figcaption><p class="cat">Оливковое масло</p><div class="sws"><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:67.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003330.jpg" alt="масло арганы">
+  <span class="score">0.667</span></div>
+  <figcaption><p class="cat">масло арганы</p><div class="sws"><i class='sw' style='--c:#B9B5AC' title='другой'></i></div></figcaption>
+  <div class="bar"><span style="width:66.7%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006726.jpg" alt="Увлажняющее масло">
+  <span class="score">0.663</span></div>
+  <figcaption><p class="cat">Увлажняющее масло</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:66.3%"></span></div></figure></div></section></div></article><article class="q" id="q2">
+  <div class="qside"><span class="qnum">03 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000002.jpg" alt="query photo"></div>
+    <p class="qcat">брюки</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004136.jpg" alt="Футболка">
+  <span class="score">0.844</span></div>
+  <figcaption><p class="cat">Футболка</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:84.4%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002835.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.841</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i></div></figcaption>
+  <div class="bar"><span style="width:84.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007604.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.838</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:83.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007839.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.836</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:83.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008962.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.836</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:83.6%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000050.jpg" alt="широкие джинсы">
+  <span class="score">0.766</span></div>
+  <figcaption><p class="cat">широкие джинсы</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:76.6%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007931.jpg" alt="широкие брюки">
+  <span class="score">0.748</span></div>
+  <figcaption><p class="cat">широкие брюки</p><div class="sws"><i class='sw' style='--c:#D4762B' title='оранжевый'></i></div></figcaption>
+  <div class="bar"><span style="width:74.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000787.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.733</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:73.3%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000321.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.726</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:72.6%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006310.jpg" alt="рваные джинсы">
+  <span class="score">0.720</span></div>
+  <figcaption><p class="cat">рваные джинсы</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:72.0%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002782.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.822</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:82.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000321.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.805</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:80.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006420.jpg" alt="высокие джинсы">
+  <span class="score">0.805</span></div>
+  <figcaption><p class="cat">высокие джинсы</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:80.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007047.jpg" alt="Широкие брюки">
+  <span class="score">0.796</span></div>
+  <figcaption><p class="cat">Широкие брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:79.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007604.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.795</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:79.5%"></span></div></figure></div></section></div></article><article class="q" id="q3">
+  <div class="qside"><span class="qnum">04 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000003.jpg" alt="query photo"></div>
+    <p class="qcat">Пудра</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001471.jpg" alt="бронзер">
+  <span class="score">0.735</span></div>
+  <figcaption><p class="cat">бронзер</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:73.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000695.jpg" alt="палетка теней">
+  <span class="score">0.733</span></div>
+  <figcaption><p class="cat">палетка теней</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#B9B5AC' title='другой'></i></div></figcaption>
+  <div class="bar"><span style="width:73.3%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001142.jpg" alt="Компактный тональный крем">
+  <span class="score">0.728</span></div>
+  <figcaption><p class="cat">Компактный тональный крем</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:72.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009432.jpg" alt="Косметическая пудра">
+  <span class="score">0.726</span></div>
+  <figcaption><p class="cat">Косметическая пудра</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:72.6%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002890.jpg" alt="Пудра для макияжа">
+  <span class="score">0.724</span></div>
+  <figcaption><p class="cat">Пудра для макияжа</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:72.4%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009432.jpg" alt="Косметическая пудра">
+  <span class="score">0.596</span></div>
+  <figcaption><p class="cat">Косметическая пудра</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:59.6%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007533.jpg" alt="Компактная пудра">
+  <span class="score">0.582</span></div>
+  <figcaption><p class="cat">Компактная пудра</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:58.2%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000315.jpg" alt="Компактная пудра">
+  <span class="score">0.580</span></div>
+  <figcaption><p class="cat">Компактная пудра</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:58.0%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001368.jpg" alt="Косметический порошок">
+  <span class="score">0.560</span></div>
+  <figcaption><p class="cat">Косметический порошок</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:56.0%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002890.jpg" alt="Пудра для макияжа">
+  <span class="score">0.546</span></div>
+  <figcaption><p class="cat">Пудра для макияжа</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:54.6%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001218.jpg" alt="Компактная пудра">
+  <span class="score">0.681</span></div>
+  <figcaption><p class="cat">Компактная пудра</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B9B5AC' title='другой'></i></div></figcaption>
+  <div class="bar"><span style="width:68.1%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008664.jpg" alt="Тональный крем">
+  <span class="score">0.648</span></div>
+  <figcaption><p class="cat">Тональный крем</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:64.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000315.jpg" alt="Компактная пудра">
+  <span class="score">0.632</span></div>
+  <figcaption><p class="cat">Компактная пудра</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:63.2%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009432.jpg" alt="Косметическая пудра">
+  <span class="score">0.628</span></div>
+  <figcaption><p class="cat">Косметическая пудра</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:62.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002309.jpg" alt="Mineral Sunscreen">
+  <span class="score">0.621</span></div>
+  <figcaption><p class="cat">Mineral Sunscreen</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:62.1%"></span></div></figure></div></section></div></article><article class="q" id="q4">
+  <div class="qside"><span class="qnum">05 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000004.jpg" alt="query photo"></div>
+    <p class="qcat">брюки</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000756.jpg" alt="спортивные брюки">
+  <span class="score">0.899</span></div>
+  <figcaption><p class="cat">спортивные брюки</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:89.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007604.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.894</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:89.4%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003823.jpg" alt="футболка">
+  <span class="score">0.879</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.9%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007402.jpg" alt="Спортивные брюки">
+  <span class="score">0.872</span></div>
+  <figcaption><p class="cat">Спортивные брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003616.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.869</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:86.9%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008666.jpg" alt="брюки-кади">
+  <span class="score">0.841</span></div>
+  <figcaption><p class="cat">брюки-кади</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:84.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003572.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.819</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000642.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.805</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:80.5%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005855.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.789</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:78.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005828.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.786</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:78.6%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000642.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.851</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:85.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003572.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.837</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:83.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005322.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.818</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005828.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.811</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.1%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007783.jpg" alt="джинсы">
+  <span class="score">0.807</span></div>
+  <figcaption><p class="cat">джинсы</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#8FB8CE' title='голубой'></i></div></figcaption>
+  <div class="bar"><span style="width:80.7%"></span></div></figure></div></section></div></article><article class="q" id="q5">
+  <div class="qside"><span class="qnum">06 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000005.jpg" alt="query photo"></div>
+    <p class="qcat">боксеры</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003430.jpg" alt="Шорты">
+  <span class="score">0.841</span></div>
+  <figcaption><p class="cat">Шорты</p><div class="sws"><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:84.1%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000597.jpg" alt="плавки">
+  <span class="score">0.835</span></div>
+  <figcaption><p class="cat">плавки</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:83.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003320.jpg" alt="Спортивные шорты">
+  <span class="score">0.828</span></div>
+  <figcaption><p class="cat">Спортивные шорты</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#D4762B' title='оранжевый'></i></div></figcaption>
+  <div class="bar"><span style="width:82.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009376.jpg" alt="красные шорты">
+  <span class="score">0.818</span></div>
+  <figcaption><p class="cat">красные шорты</p><div class="sws"><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:81.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004477.jpg" alt="Шорты">
+  <span class="score">0.813</span></div>
+  <figcaption><p class="cat">Шорты</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.3%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007374.jpg" alt="боксеры">
+  <b class="tag">same type</b><span class="score">0.679</span></div>
+  <figcaption><p class="cat">боксеры</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:67.9%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002454.jpg" alt="боксёры">
+  <span class="score">0.675</span></div>
+  <figcaption><p class="cat">боксёры</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:67.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003757.jpg" alt="трусы-плавки">
+  <span class="score">0.673</span></div>
+  <figcaption><p class="cat">трусы-плавки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:67.3%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002181.jpg" alt="Шорты">
+  <span class="score">0.661</span></div>
+  <figcaption><p class="cat">Шорты</p><div class="sws"><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:66.1%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009170.jpg" alt="трусы">
+  <span class="score">0.654</span></div>
+  <figcaption><p class="cat">трусы</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:65.4%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008183.jpg" alt="шорты">
+  <span class="score">0.706</span></div>
+  <figcaption><p class="cat">шорты</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:70.6%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003757.jpg" alt="трусы-плавки">
+  <span class="score">0.695</span></div>
+  <figcaption><p class="cat">трусы-плавки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:69.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007100.jpg" alt="Трусы">
+  <span class="score">0.687</span></div>
+  <figcaption><p class="cat">Трусы</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:68.7%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000597.jpg" alt="плавки">
+  <span class="score">0.686</span></div>
+  <figcaption><p class="cat">плавки</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:68.6%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008964.jpg" alt="боксёры">
+  <span class="score">0.681</span></div>
+  <figcaption><p class="cat">боксёры</p><div class="sws"><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:68.1%"></span></div></figure></div></section></div></article><article class="q" id="q6">
+  <div class="qside"><span class="qnum">07 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000006.jpg" alt="query photo"></div>
+    <p class="qcat">брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#33507F' title='синий'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002963.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.960</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:96.0%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008929.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.954</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:95.4%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005154.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.951</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:95.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007288.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.946</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:94.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009860.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.945</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:94.5%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002920.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.918</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:91.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009860.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.869</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:86.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001993.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.869</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:86.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002963.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.867</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:86.7%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002485.jpg" alt="рубашка">
+  <span class="score">0.859</span></div>
+  <figcaption><p class="cat">рубашка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:85.9%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004725.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.933</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:93.3%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002920.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.932</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:93.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007288.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.924</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:92.4%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001993.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.917</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:91.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009860.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.917</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:91.7%"></span></div></figure></div></section></div></article><article class="q" id="q7">
+  <div class="qside"><span class="qnum">08 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000007.jpg" alt="query photo"></div>
+    <p class="qcat">настольная лампа</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001591.jpg" alt="настольная лампа">
+  <b class="tag">same type</b><span class="score">0.892</span></div>
+  <figcaption><p class="cat">настольная лампа</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:89.2%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007128.jpg" alt="напольная лампа">
+  <span class="score">0.884</span></div>
+  <figcaption><p class="cat">напольная лампа</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:88.4%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004532.jpg" alt="лампа">
+  <span class="score">0.882</span></div>
+  <figcaption><p class="cat">лампа</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:88.2%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003620.jpg" alt="настенный светильник">
+  <span class="score">0.872</span></div>
+  <figcaption><p class="cat">настенный светильник</p><div class="sws"><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:87.2%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008001.jpg" alt="Светильник">
+  <span class="score">0.869</span></div>
+  <figcaption><p class="cat">Светильник</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:86.9%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004532.jpg" alt="лампа">
+  <span class="score">0.839</span></div>
+  <figcaption><p class="cat">лампа</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:83.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001591.jpg" alt="настольная лампа">
+  <b class="tag">same type</b><span class="score">0.795</span></div>
+  <figcaption><p class="cat">настольная лампа</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:79.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007128.jpg" alt="напольная лампа">
+  <span class="score">0.792</span></div>
+  <figcaption><p class="cat">напольная лампа</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:79.2%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009913.jpg" alt="лампа">
+  <span class="score">0.788</span></div>
+  <figcaption><p class="cat">лампа</p><div class="sws"><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:78.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004997.jpg" alt="Лампа">
+  <span class="score">0.782</span></div>
+  <figcaption><p class="cat">Лампа</p><div class="sws"><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:78.2%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004532.jpg" alt="лампа">
+  <span class="score">0.918</span></div>
+  <figcaption><p class="cat">лампа</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:91.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007875.jpg" alt="Настольная лампа">
+  <b class="tag">same type</b><span class="score">0.876</span></div>
+  <figcaption><p class="cat">Настольная лампа</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.6%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004997.jpg" alt="Лампа">
+  <span class="score">0.863</span></div>
+  <figcaption><p class="cat">Лампа</p><div class="sws"><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:86.3%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007128.jpg" alt="напольная лампа">
+  <span class="score">0.856</span></div>
+  <figcaption><p class="cat">напольная лампа</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:85.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005977.jpg" alt="настольная лампа">
+  <b class="tag">same type</b><span class="score">0.840</span></div>
+  <figcaption><p class="cat">настольная лампа</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:84.0%"></span></div></figure></div></section></div></article><article class="q" id="q8">
+  <div class="qside"><span class="qnum">09 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000008.jpg" alt="query photo"></div>
+    <p class="qcat">футболка</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003899.jpg" alt="платье">
+  <span class="score">0.819</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#D4762B' title='оранжевый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.9%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001813.jpg" alt="худи">
+  <span class="score">0.816</span></div>
+  <figcaption><p class="cat">худи</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008057.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.811</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007855.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.809</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i></div></figcaption>
+  <div class="bar"><span style="width:80.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001276.jpg" alt="Футболка">
+  <b class="tag">same type</b><span class="score">0.808</span></div>
+  <figcaption><p class="cat">Футболка</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:80.8%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003488.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.627</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:62.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005428.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.623</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:62.3%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001813.jpg" alt="худи">
+  <span class="score">0.606</span></div>
+  <figcaption><p class="cat">худи</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:60.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005267.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.596</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:59.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007648.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.586</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:58.6%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005428.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.723</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:72.3%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003488.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.717</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:71.7%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001813.jpg" alt="худи">
+  <span class="score">0.717</span></div>
+  <figcaption><p class="cat">худи</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:71.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003344.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.686</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:68.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007648.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.681</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:68.1%"></span></div></figure></div></section></div></article><article class="q" id="q9">
+  <div class="qside"><span class="qnum">10 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000009.jpg" alt="query photo"></div>
+    <p class="qcat">Сари</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009198.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.890</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#D4762B' title='оранжевый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:89.0%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001362.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.888</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:88.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000025.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.883</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:88.3%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003864.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.879</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:87.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003207.jpg" alt="сари">
+  <b class="tag">same type</b><span class="score">0.879</span></div>
+  <figcaption><p class="cat">сари</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.9%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000025.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.838</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:83.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004435.jpg" alt="сари">
+  <b class="tag">same type</b><span class="score">0.828</span></div>
+  <figcaption><p class="cat">сари</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:82.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004606.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.827</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:82.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009326.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.827</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#7A5A8C' title='фиолетовый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:82.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003864.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.825</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:82.5%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000025.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.888</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:88.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003094.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.881</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:88.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007713.jpg" alt="сари">
+  <b class="tag">same type</b><span class="score">0.869</span></div>
+  <figcaption><p class="cat">сари</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:86.9%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006966.jpg" alt="Сарī">
+  <span class="score">0.865</span></div>
+  <figcaption><p class="cat">Сарī</p><div class="sws"><i class='sw' style='--c:#7A5A8C' title='фиолетовый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:86.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005790.jpg" alt="сарe">
+  <span class="score">0.861</span></div>
+  <figcaption><p class="cat">сарe</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:86.1%"></span></div></figure></div></section></div></article><article class="q" id="q10">
+  <div class="qside"><span class="qnum">11 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000010.jpg" alt="query photo"></div>
+    <p class="qcat">брюки</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003325.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.952</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:95.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009268.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.949</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:94.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007125.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.947</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:94.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001404.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.942</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:94.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007919.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.942</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:94.2%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000568.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.911</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:91.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000739.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.903</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:90.3%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008283.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.896</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:89.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003382.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.888</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:88.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007023.jpg" alt="джинсы">
+  <span class="score">0.878</span></div>
+  <figcaption><p class="cat">джинсы</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.8%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000739.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.935</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:93.5%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000568.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.923</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:92.3%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006813.jpg" alt="брюки">
+  <b class="tag">same type</b><span class="score">0.919</span></div>
+  <figcaption><p class="cat">брюки</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:91.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005445.jpg" alt="Брюки">
+  <b class="tag">same type</b><span class="score">0.919</span></div>
+  <figcaption><p class="cat">Брюки</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:91.9%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000355.jpg" alt="черные брюки">
+  <span class="score">0.919</span></div>
+  <figcaption><p class="cat">черные брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:91.9%"></span></div></figure></div></section></div></article><article class="q" id="q11">
+  <div class="qside"><span class="qnum">12 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000011.jpg" alt="query photo"></div>
+    <p class="qcat">трусики</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#33507F' title='синий'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001106.jpg" alt="Трусики">
+  <b class="tag">same type</b><span class="score">0.927</span></div>
+  <figcaption><p class="cat">Трусики</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:92.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006678.jpg" alt="Трусики">
+  <b class="tag">same type</b><span class="score">0.926</span></div>
+  <figcaption><p class="cat">Трусики</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:92.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007449.jpg" alt="трусики">
+  <b class="tag">same type</b><span class="score">0.926</span></div>
+  <figcaption><p class="cat">трусики</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#7A5A8C' title='фиолетовый'></i></div></figcaption>
+  <div class="bar"><span style="width:92.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009813.jpg" alt="Трусики">
+  <b class="tag">same type</b><span class="score">0.920</span></div>
+  <figcaption><p class="cat">Трусики</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:92.0%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002837.jpg" alt="Трусики">
+  <b class="tag">same type</b><span class="score">0.920</span></div>
+  <figcaption><p class="cat">Трусики</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:92.0%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007638.jpg" alt="трусики">
+  <b class="tag">same type</b><span class="score">0.817</span></div>
+  <figcaption><p class="cat">трусики</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009123.jpg" alt="Трусики">
+  <b class="tag">same type</b><span class="score">0.810</span></div>
+  <figcaption><p class="cat">Трусики</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.0%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005153.jpg" alt="нижнее белье">
+  <span class="score">0.807</span></div>
+  <figcaption><p class="cat">нижнее белье</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:80.7%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000689.jpg" alt="плавки">
+  <span class="score">0.806</span></div>
+  <figcaption><p class="cat">плавки</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:80.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009124.jpg" alt="трусики">
+  <b class="tag">same type</b><span class="score">0.800</span></div>
+  <figcaption><p class="cat">трусики</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#B9B5AC' title='другой'></i></div></figcaption>
+  <div class="bar"><span style="width:80.0%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005759.jpg" alt="женские трусики">
+  <span class="score">0.871</span></div>
+  <figcaption><p class="cat">женские трусики</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009123.jpg" alt="Трусики">
+  <b class="tag">same type</b><span class="score">0.848</span></div>
+  <figcaption><p class="cat">Трусики</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:84.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008786.jpg" alt="Трусики">
+  <b class="tag">same type</b><span class="score">0.844</span></div>
+  <figcaption><p class="cat">Трусики</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:84.4%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005153.jpg" alt="нижнее белье">
+  <span class="score">0.840</span></div>
+  <figcaption><p class="cat">нижнее белье</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:84.0%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005647.jpg" alt="трусики">
+  <b class="tag">same type</b><span class="score">0.831</span></div>
+  <figcaption><p class="cat">трусики</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:83.1%"></span></div></figure></div></section></div></article><article class="q" id="q12">
+  <div class="qside"><span class="qnum">13 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000012.jpg" alt="query photo"></div>
+    <p class="qcat">сари</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005677.jpg" alt="саре">
+  <span class="score">0.955</span></div>
+  <figcaption><p class="cat">саре</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#7A5A8C' title='фиолетовый'></i></div></figcaption>
+  <div class="bar"><span style="width:95.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006097.jpg" alt="Сарафан">
+  <span class="score">0.951</span></div>
+  <figcaption><p class="cat">Сарафан</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:95.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009662.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.948</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:94.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003532.jpg" alt="сарэ">
+  <span class="score">0.942</span></div>
+  <figcaption><p class="cat">сарэ</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#D4762B' title='оранжевый'></i></div></figcaption>
+  <div class="bar"><span style="width:94.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002640.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.938</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:93.8%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005677.jpg" alt="саре">
+  <span class="score">0.905</span></div>
+  <figcaption><p class="cat">саре</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#7A5A8C' title='фиолетовый'></i></div></figcaption>
+  <div class="bar"><span style="width:90.5%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008489.jpg" alt="сари">
+  <b class="tag">same type</b><span class="score">0.897</span></div>
+  <figcaption><p class="cat">сари</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:89.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003579.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.892</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:89.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009025.jpg" alt="сари">
+  <b class="tag">same type</b><span class="score">0.872</span></div>
+  <figcaption><p class="cat">сари</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001673.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.872</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.2%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005677.jpg" alt="саре">
+  <span class="score">0.953</span></div>
+  <figcaption><p class="cat">саре</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#7A5A8C' title='фиолетовый'></i></div></figcaption>
+  <div class="bar"><span style="width:95.3%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009025.jpg" alt="сари">
+  <b class="tag">same type</b><span class="score">0.932</span></div>
+  <figcaption><p class="cat">сари</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:93.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008489.jpg" alt="сари">
+  <b class="tag">same type</b><span class="score">0.928</span></div>
+  <figcaption><p class="cat">сари</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:92.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003579.jpg" alt="Сари">
+  <b class="tag">same type</b><span class="score">0.909</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:90.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002794.jpg" alt="сари">
+  <b class="tag">same type</b><span class="score">0.908</span></div>
+  <figcaption><p class="cat">сари</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:90.8%"></span></div></figure></div></section></div></article><article class="q" id="q13">
+  <div class="qside"><span class="qnum">14 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000013.jpg" alt="query photo"></div>
+    <p class="qcat">Сумка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007343.jpg" alt="Сумка">
+  <b class="tag">same type</b><span class="score">0.880</span></div>
+  <figcaption><p class="cat">Сумка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:88.0%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008827.jpg" alt="сумка">
+  <b class="tag">same type</b><span class="score">0.868</span></div>
+  <figcaption><p class="cat">сумка</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:86.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006429.jpg" alt="сумка">
+  <b class="tag">same type</b><span class="score">0.861</span></div>
+  <figcaption><p class="cat">сумка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:86.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004352.jpg" alt="сумка">
+  <b class="tag">same type</b><span class="score">0.839</span></div>
+  <figcaption><p class="cat">сумка</p><div class="sws"><i class='sw' style='--c:#D4762B' title='оранжевый'></i><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:83.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006006.jpg" alt="Сумка">
+  <b class="tag">same type</b><span class="score">0.833</span></div>
+  <figcaption><p class="cat">Сумка</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:83.3%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006429.jpg" alt="сумка">
+  <b class="tag">same type</b><span class="score">0.829</span></div>
+  <figcaption><p class="cat">сумка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:82.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007343.jpg" alt="Сумка">
+  <b class="tag">same type</b><span class="score">0.815</span></div>
+  <figcaption><p class="cat">Сумка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:81.5%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008827.jpg" alt="сумка">
+  <b class="tag">same type</b><span class="score">0.808</span></div>
+  <figcaption><p class="cat">сумка</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:80.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005745.jpg" alt="Сумка">
+  <b class="tag">same type</b><span class="score">0.784</span></div>
+  <figcaption><p class="cat">Сумка</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:78.4%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006006.jpg" alt="Сумка">
+  <b class="tag">same type</b><span class="score">0.765</span></div>
+  <figcaption><p class="cat">Сумка</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:76.5%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007343.jpg" alt="Сумка">
+  <b class="tag">same type</b><span class="score">0.880</span></div>
+  <figcaption><p class="cat">Сумка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:88.0%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006429.jpg" alt="сумка">
+  <b class="tag">same type</b><span class="score">0.872</span></div>
+  <figcaption><p class="cat">сумка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008827.jpg" alt="сумка">
+  <b class="tag">same type</b><span class="score">0.855</span></div>
+  <figcaption><p class="cat">сумка</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:85.5%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006006.jpg" alt="Сумка">
+  <b class="tag">same type</b><span class="score">0.823</span></div>
+  <figcaption><p class="cat">Сумка</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:82.3%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005745.jpg" alt="Сумка">
+  <b class="tag">same type</b><span class="score">0.815</span></div>
+  <figcaption><p class="cat">Сумка</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.5%"></span></div></figure></div></section></div></article><article class="q" id="q14">
+  <div class="qside"><span class="qnum">15 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000014.jpg" alt="query photo"></div>
+    <p class="qcat">Спортивные брюки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008578.jpg" alt="Спортивные брюки">
+  <b class="tag">same type</b><span class="score">0.939</span></div>
+  <figcaption><p class="cat">Спортивные брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:93.9%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001759.jpg" alt="леггинсы">
+  <span class="score">0.933</span></div>
+  <figcaption><p class="cat">леггинсы</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:93.3%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000012.jpg" alt="спортивные брюки">
+  <b class="tag">same type</b><span class="score">0.933</span></div>
+  <figcaption><p class="cat">спортивные брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:93.3%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008151.jpg" alt="Спортивные брюки">
+  <b class="tag">same type</b><span class="score">0.928</span></div>
+  <figcaption><p class="cat">Спортивные брюки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:92.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004697.jpg" alt="спортивные штаны">
+  <span class="score">0.927</span></div>
+  <figcaption><p class="cat">спортивные штаны</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:92.7%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009017.jpg" alt="Спортивные брюки">
+  <b class="tag">same type</b><span class="score">0.804</span></div>
+  <figcaption><p class="cat">Спортивные брюки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:80.4%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002034.jpg" alt="Спортивные брюки">
+  <b class="tag">same type</b><span class="score">0.765</span></div>
+  <figcaption><p class="cat">Спортивные брюки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:76.5%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009874.jpg" alt="спортивные брюки">
+  <b class="tag">same type</b><span class="score">0.748</span></div>
+  <figcaption><p class="cat">спортивные брюки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:74.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004190.jpg" alt="Спортивные штаны">
+  <span class="score">0.747</span></div>
+  <figcaption><p class="cat">Спортивные штаны</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:74.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008053.jpg" alt="Спортивные брюки">
+  <b class="tag">same type</b><span class="score">0.746</span></div>
+  <figcaption><p class="cat">Спортивные брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:74.6%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009017.jpg" alt="Спортивные брюки">
+  <b class="tag">same type</b><span class="score">0.841</span></div>
+  <figcaption><p class="cat">Спортивные брюки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:84.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000148.jpg" alt="Спортивные брюки">
+  <b class="tag">same type</b><span class="score">0.811</span></div>
+  <figcaption><p class="cat">Спортивные брюки</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:81.1%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001533.jpg" alt="Спортивные лосины">
+  <span class="score">0.808</span></div>
+  <figcaption><p class="cat">Спортивные лосины</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:80.8%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008151.jpg" alt="Спортивные брюки">
+  <b class="tag">same type</b><span class="score">0.807</span></div>
+  <figcaption><p class="cat">Спортивные брюки</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:80.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004617.jpg" alt="Спортивные брюки">
+  <b class="tag">same type</b><span class="score">0.805</span></div>
+  <figcaption><p class="cat">Спортивные брюки</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:80.5%"></span></div></figure></div></section></div></article><article class="q" id="q15">
+  <div class="qside"><span class="qnum">16 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000015.jpg" alt="query photo"></div>
+    <p class="qcat">Курта</p><div class="sws"><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002424.jpg" alt="платье">
+  <span class="score">0.868</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#7A5A8C' title='фиолетовый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:86.8%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008353.jpg" alt="платье">
+  <span class="score">0.854</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#8FB8CE' title='голубой'></i></div></figcaption>
+  <div class="bar"><span style="width:85.4%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009269.jpg" alt="ткань для платья">
+  <span class="score">0.850</span></div>
+  <figcaption><p class="cat">ткань для платья</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:85.0%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006162.jpg" alt="Сари">
+  <span class="score">0.843</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:84.3%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001882.jpg" alt="Ожерелье">
+  <span class="score">0.842</span></div>
+  <figcaption><p class="cat">Ожерелье</p><div class="sws"><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:84.2%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006162.jpg" alt="Сари">
+  <span class="score">0.821</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:82.1%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009269.jpg" alt="ткань для платья">
+  <span class="score">0.752</span></div>
+  <figcaption><p class="cat">ткань для платья</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:75.2%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002424.jpg" alt="платье">
+  <span class="score">0.739</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#7A5A8C' title='фиолетовый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:73.9%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001113.jpg" alt="Сари">
+  <span class="score">0.714</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:71.4%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008293.jpg" alt="Ткань оранжевая">
+  <span class="score">0.704</span></div>
+  <figcaption><p class="cat">Ткань оранжевая</p><div class="sws"><i class='sw' style='--c:#D4762B' title='оранжевый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:70.4%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006162.jpg" alt="Сари">
+  <span class="score">0.902</span></div>
+  <figcaption><p class="cat">Сари</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#D9BE4A' title='желтый'></i></div></figcaption>
+  <div class="bar"><span style="width:90.2%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009269.jpg" alt="ткань для платья">
+  <span class="score">0.884</span></div>
+  <figcaption><p class="cat">ткань для платья</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:88.4%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008293.jpg" alt="Ткань оранжевая">
+  <span class="score">0.872</span></div>
+  <figcaption><p class="cat">Ткань оранжевая</p><div class="sws"><i class='sw' style='--c:#D4762B' title='оранжевый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.2%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007721.jpg" alt="платье">
+  <span class="score">0.865</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#D9BE4A' title='желтый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:86.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008353.jpg" alt="платье">
+  <span class="score">0.853</span></div>
+  <figcaption><p class="cat">платье</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#8FB8CE' title='голубой'></i></div></figcaption>
+  <div class="bar"><span style="width:85.3%"></span></div></figure></div></section></div></article><article class="q" id="q16">
+  <div class="qside"><span class="qnum">17 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000016.jpg" alt="query photo"></div>
+    <p class="qcat">Кровать</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#8C8A85' title='серый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003455.jpg" alt="постельное белье">
+  <span class="score">0.945</span></div>
+  <figcaption><p class="cat">постельное белье</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:94.5%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006591.jpg" alt="простыня">
+  <span class="score">0.939</span></div>
+  <figcaption><p class="cat">простыня</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:93.9%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007267.jpg" alt="постельное белье">
+  <span class="score">0.937</span></div>
+  <figcaption><p class="cat">постельное белье</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:93.7%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003413.jpg" alt="постельное белье">
+  <span class="score">0.931</span></div>
+  <figcaption><p class="cat">постельное белье</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#D4762B' title='оранжевый'></i><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:93.1%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009273.jpg" alt="Постельное белье">
+  <span class="score">0.929</span></div>
+  <figcaption><p class="cat">Постельное белье</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:92.9%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005851.jpg" alt="Покрывало">
+  <span class="score">0.833</span></div>
+  <figcaption><p class="cat">Покрывало</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:83.3%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000973.jpg" alt="кровать">
+  <b class="tag">same type</b><span class="score">0.816</span></div>
+  <figcaption><p class="cat">кровать</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.6%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000380.jpg" alt="Постельное белье">
+  <span class="score">0.789</span></div>
+  <figcaption><p class="cat">Постельное белье</p><div class="sws"><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B9B5AC' title='другой'></i></div></figcaption>
+  <div class="bar"><span style="width:78.9%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005301.jpg" alt="пододеяльник">
+  <span class="score">0.786</span></div>
+  <figcaption><p class="cat">пододеяльник</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:78.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001785.jpg" alt="Кровать">
+  <b class="tag">same type</b><span class="score">0.785</span></div>
+  <figcaption><p class="cat">Кровать</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:78.5%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000380.jpg" alt="Постельное белье">
+  <span class="score">0.854</span></div>
+  <figcaption><p class="cat">Постельное белье</p><div class="sws"><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B9B5AC' title='другой'></i></div></figcaption>
+  <div class="bar"><span style="width:85.4%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005851.jpg" alt="Покрывало">
+  <span class="score">0.840</span></div>
+  <figcaption><p class="cat">Покрывало</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:84.0%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005301.jpg" alt="пододеяльник">
+  <span class="score">0.837</span></div>
+  <figcaption><p class="cat">пододеяльник</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:83.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004037.jpg" alt="Кровать">
+  <b class="tag">same type</b><span class="score">0.836</span></div>
+  <figcaption><p class="cat">Кровать</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:83.6%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003455.jpg" alt="постельное белье">
+  <span class="score">0.816</span></div>
+  <figcaption><p class="cat">постельное белье</p><div class="sws"><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:81.6%"></span></div></figure></div></section></div></article><article class="q" id="q17">
+  <div class="qside"><span class="qnum">18 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000017.jpg" alt="query photo"></div>
+    <p class="qcat">футболка</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003385.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.672</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#D4762B' title='оранжевый'></i></div></figcaption>
+  <div class="bar"><span style="width:67.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000302.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.664</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#D4762B' title='оранжевый'></i><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:66.4%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000189.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.663</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:66.3%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005904.jpg" alt="Топ на бретелях">
+  <span class="score">0.651</span></div>
+  <figcaption><p class="cat">Топ на бретелях</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:65.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/005588.jpg" alt="Футболка">
+  <b class="tag">same type</b><span class="score">0.650</span></div>
+  <figcaption><p class="cat">Футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:65.0%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000452.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.573</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:57.3%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002215.jpg" alt="Футболка">
+  <b class="tag">same type</b><span class="score">0.572</span></div>
+  <figcaption><p class="cat">Футболка</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:57.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007752.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.570</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#B9B5AC' title='другой'></i></div></figcaption>
+  <div class="bar"><span style="width:57.0%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000302.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.551</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#D4762B' title='оранжевый'></i><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:55.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001760.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.548</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i></div></figcaption>
+  <div class="bar"><span style="width:54.8%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007422.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.724</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:72.4%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006610.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.720</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#D4762B' title='оранжевый'></i></div></figcaption>
+  <div class="bar"><span style="width:72.0%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001910.jpg" alt="Футболка">
+  <b class="tag">same type</b><span class="score">0.717</span></div>
+  <figcaption><p class="cat">Футболка</p><div class="sws"><i class='sw' style='--c:#D4762B' title='оранжевый'></i></div></figcaption>
+  <div class="bar"><span style="width:71.7%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000452.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.705</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:70.5%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009325.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.699</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:69.9%"></span></div></figure></div></section></div></article><article class="q" id="q18">
+  <div class="qside"><span class="qnum">19 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000018.jpg" alt="query photo"></div>
+    <p class="qcat">Футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#8FB8CE' title='голубой'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000528.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.842</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:84.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002550.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.836</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:83.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007752.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.831</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#B9B5AC' title='другой'></i></div></figcaption>
+  <div class="bar"><span style="width:83.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002074.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.831</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:83.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002191.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.828</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:82.8%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001764.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.719</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B9B5AC' title='другой'></i></div></figcaption>
+  <div class="bar"><span style="width:71.9%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002799.jpg" alt="Футболка">
+  <b class="tag">same type</b><span class="score">0.716</span></div>
+  <figcaption><p class="cat">Футболка</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:71.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002550.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.715</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:71.5%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000867.jpg" alt="Футболка">
+  <b class="tag">same type</b><span class="score">0.711</span></div>
+  <figcaption><p class="cat">Футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:71.1%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001910.jpg" alt="Футболка">
+  <b class="tag">same type</b><span class="score">0.710</span></div>
+  <figcaption><p class="cat">Футболка</p><div class="sws"><i class='sw' style='--c:#D4762B' title='оранжевый'></i></div></figcaption>
+  <div class="bar"><span style="width:71.0%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001784.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.794</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#33507F' title='синий'></i><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:79.4%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009759.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.782</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:78.2%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003588.jpg" alt="Футболка">
+  <b class="tag">same type</b><span class="score">0.776</span></div>
+  <figcaption><p class="cat">Футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#1A1714' title='черный'></i></div></figcaption>
+  <div class="bar"><span style="width:77.6%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/001764.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.775</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#B9B5AC' title='другой'></i></div></figcaption>
+  <div class="bar"><span style="width:77.5%"></span></div></figure>
+<figure class="card is-hit">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004158.jpg" alt="футболка">
+  <b class="tag">same type</b><span class="score">0.774</span></div>
+  <figcaption><p class="cat">футболка</p><div class="sws"><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#8C8A85' title='серый'></i><i class='sw' style='--c:#5C7A4B' title='зеленый'></i></div></figcaption>
+  <div class="bar"><span style="width:77.4%"></span></div></figure></div></section></div></article><article class="q" id="q19">
+  <div class="qside"><span class="qnum">20 / 20</span>
+    <div class="qframe"><img loading="lazy" src="../../data/queries/images/000019.jpg" alt="query photo"></div>
+    <p class="qcat">Тушь для ресниц</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i></div>
+    <p class="qmeta">Uploaded photo</p></div>
+  <div class="qmain"><section class="row" data-model="clip-vit-b32">
+  <h4><span class="dot" data-m="clip-vit-b32"></span>clip-vit-b32</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/009696.jpg" alt="Помада">
+  <span class="score">0.871</span></div>
+  <figcaption><p class="cat">Помада</p><div class="sws"><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:87.1%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000599.jpg" alt="губная помада">
+  <span class="score">0.870</span></div>
+  <figcaption><p class="cat">губная помада</p><div class="sws"><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.0%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/006543.jpg" alt="губная помада">
+  <span class="score">0.870</span></div>
+  <figcaption><p class="cat">губная помада</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:87.0%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002969.jpg" alt="Блеск для губ">
+  <span class="score">0.869</span></div>
+  <figcaption><p class="cat">Блеск для губ</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#33507F' title='синий'></i></div></figcaption>
+  <div class="bar"><span style="width:86.9%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004370.jpg" alt="губная помада">
+  <span class="score">0.869</span></div>
+  <figcaption><p class="cat">губная помада</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:86.9%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionclip">
+  <h4><span class="dot" data-m="marqo-fashionclip"></span>marqo-fashionclip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000000.jpg" alt="жидкая подводка для глаз">
+  <span class="score">0.714</span></div>
+  <figcaption><p class="cat">жидкая подводка для глаз</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:71.4%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002263.jpg" alt="Гелевая подводка для глаз">
+  <span class="score">0.707</span></div>
+  <figcaption><p class="cat">Гелевая подводка для глаз</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:70.7%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004787.jpg" alt="Губная помада">
+  <span class="score">0.704</span></div>
+  <figcaption><p class="cat">Губная помада</p><div class="sws"><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:70.4%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007428.jpg" alt="губная помада">
+  <span class="score">0.699</span></div>
+  <figcaption><p class="cat">губная помада</p><div class="sws"><i class='sw' style='--c:#7A5A8C' title='фиолетовый'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:69.9%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/004675.jpg" alt="губная помада">
+  <span class="score">0.695</span></div>
+  <figcaption><p class="cat">губная помада</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#B4291F' title='красный'></i><i class='sw' style='--c:#7A5A8C' title='фиолетовый'></i><i class='sw' style='--c:#F2EFE8' title='белый'></i></div></figcaption>
+  <div class="bar"><span style="width:69.5%"></span></div></figure></div></section>
+<section class="row" data-model="marqo-fashionsiglip">
+  <h4><span class="dot" data-m="marqo-fashionsiglip"></span>marqo-fashionsiglip</h4>
+  <div class="strip"><figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/002263.jpg" alt="Гелевая подводка для глаз">
+  <span class="score">0.733</span></div>
+  <figcaption><p class="cat">Гелевая подводка для глаз</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:73.3%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/000000.jpg" alt="жидкая подводка для глаз">
+  <span class="score">0.732</span></div>
+  <figcaption><p class="cat">жидкая подводка для глаз</p><div class="sws"><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:73.2%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/003032.jpg" alt="Помада для губ">
+  <span class="score">0.710</span></div>
+  <figcaption><p class="cat">Помада для губ</p><div class="sws"><i class='sw' style='--c:#E4A2B2' title='розовый'></i><i class='sw' style='--c:#7A5440' title='коричневый'></i></div></figcaption>
+  <div class="bar"><span style="width:71.0%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/008619.jpg" alt="Губная помада">
+  <span class="score">0.710</span></div>
+  <figcaption><p class="cat">Губная помада</p><div class="sws"><i class='sw' style='--c:#B4291F' title='красный'></i></div></figcaption>
+  <div class="bar"><span style="width:71.0%"></span></div></figure>
+<figure class="card">
+  <div class="frame"><img loading="lazy" src="../../data/catalogue/images/007262.jpg" alt="Жидкая помада для губ">
+  <span class="score">0.706</span></div>
+  <figcaption><p class="cat">Жидкая помада для губ</p><div class="sws"><i class='sw' style='--c:#1A1714' title='черный'></i><i class='sw' style='--c:#E4A2B2' title='розовый'></i></div></figcaption>
+  <div class="bar"><span style="width:70.6%"></span></div></figure></div></section></div></article></main>
+<footer class="wrap"><span>Queries held out — never indexed</span>
+<span>Cosine similarity · exact brute-force search</span></footer>
+
+<script>
+const chips=[...document.querySelectorAll('.chip')],count=document.getElementById('count'),
+      total=document.querySelectorAll('.q').length;
+function sync(){
+  const on=chips.filter(c=>c.classList.contains('is-on')).map(c=>c.dataset.model);
+  document.querySelectorAll('.row').forEach(r=>{r.hidden=!on.includes(r.dataset.model)});
+  count.textContent=on.length+' of '+chips.length+' models · '+total+' queries';
+}
+chips.forEach(c=>c.addEventListener('click',()=>{
+  const on=chips.filter(x=>x.classList.contains('is-on'));
+  if(on.length===1&&on[0]===c)return;
+  c.classList.toggle('is-on');
+  c.setAttribute('aria-pressed',c.classList.contains('is-on'));
+  sync();
+}));
+sync();
+</script></body></html>

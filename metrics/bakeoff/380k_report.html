@@ -1,0 +1,496 @@
+<!doctype html><meta charset='utf-8'><style>
+    body{font:14px system-ui;margin:24px;background:#fafafa}
+    h1{font-size:20px} h2{font-size:15px;margin:18px 0 6px}
+    .q{background:#fff;border:1px solid #ddd;border-radius:8px;padding:16px;margin-bottom:24px}
+    .strip{display:flex;gap:10px;flex-wrap:wrap}
+    figure{margin:0;width:120px} img{width:120px;height:160px;object-fit:cover;border-radius:4px}
+    figcaption{font-size:11px;color:#444;margin-top:4px;line-height:1.3}
+    .query img{outline:3px solid #2563eb}
+    table{border-collapse:collapse;margin-bottom:24px} td,th{border:1px solid #ddd;padding:6px 10px;text-align:left}
+    </style>
+<h1>Embedding model bake-off</h1>
+<table><tr><th>model</th><th>dim</th><th>catalogue embed</th><th>query latency (brute force)</th></tr>
+<tr><td>clip-vit-b32</td><td>512</td><td>1648.9s</td><td>5.14 ms</td></tr>
+<tr><td>marqo-fashionclip</td><td>512</td><td>4008.9s</td><td>5.94 ms</td></tr>
+<tr><td>marqo-fashionsiglip</td><td>768</td><td>4286.1s</td><td>5.57 ms</td></tr>
+</table>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000000.jpg'><figcaption><b>query 0</b><br>платье · голубой, зеленый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/324527.jpg'><figcaption>0.928<br>летнее платье · голубой, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/182923.jpg'><figcaption>0.925<br>футболка · белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/259036.jpg'><figcaption>0.914<br>Платье · белый, голубой, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/352269.jpg'><figcaption>0.907<br>платье · голубой, белый, желтый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/252005.jpg'><figcaption>0.904<br>Платье · черный, розовый, зеленый</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/244587.jpg'><figcaption>0.811<br>платье · голубой</figcaption></figure>
+<figure><img src='../../data/catalogue/images/086657.jpg'><figcaption>0.757<br>платье · белый, синий, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/109184.jpg'><figcaption>0.747<br>Платье · голубой</figcaption></figure>
+<figure><img src='../../data/catalogue/images/096940.jpg'><figcaption>0.747<br>летнее платье · белый, голубой</figcaption></figure>
+<figure><img src='../../data/catalogue/images/158173.jpg'><figcaption>0.744<br>Платье · желтый, голубой, зеленый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/244587.jpg'><figcaption>0.859<br>платье · голубой</figcaption></figure>
+<figure><img src='../../data/catalogue/images/109184.jpg'><figcaption>0.836<br>Платье · голубой</figcaption></figure>
+<figure><img src='../../data/catalogue/images/158173.jpg'><figcaption>0.835<br>Платье · желтый, голубой, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/103108.jpg'><figcaption>0.822<br>платье · розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/317074.jpg'><figcaption>0.809<br>платье · синий, оранжевый, белый</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000001.jpg'><figcaption><b>query 1</b><br>бутылка масла арганы · коричневый, белый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/244671.jpg'><figcaption>0.837<br>пузырек соевого масла · желтый, коричневый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/086908.jpg'><figcaption>0.816<br>Бутылка с льняным маслом · коричневый, желтый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/358205.jpg'><figcaption>0.814<br>Эфирное масло · коричневый, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/382279.jpg'><figcaption>0.809<br>флакон сыворотки · коричневый, зеленый, белый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/189559.jpg'><figcaption>0.809<br>Эссенциальное масло · зеленый, желтый, коричневый</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/117504.jpg'><figcaption>0.766<br>масло арганы · желтый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/172509.jpg'><figcaption>0.752<br>Масло для лица · белый, зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/116595.jpg'><figcaption>0.722<br>Масло арганы · зеленый, желтый, коричневый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/382910.jpg'><figcaption>0.709<br>аргановое масло · желтый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/377698.jpg'><figcaption>0.695<br>Аргановое масло · коричневый, зеленый, белый, черный</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/172509.jpg'><figcaption>0.787<br>Масло для лица · белый, зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/375704.jpg'><figcaption>0.774<br>Масло арганы · коричневый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/311622.jpg'><figcaption>0.763<br>Сыворотка для волос · коричневый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/382910.jpg'><figcaption>0.757<br>аргановое масло · желтый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/117504.jpg'><figcaption>0.740<br>масло арганы · желтый, черный</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000002.jpg'><figcaption><b>query 2</b><br>брюки · коричневый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/104820.jpg'><figcaption>0.886<br>футболка · голубой</figcaption></figure>
+<figure><img src='../../data/catalogue/images/243552.jpg'><figcaption>0.878<br>брюки · синий, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/145739.jpg'><figcaption>0.877<br>толстовка · синий, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/193509.jpg'><figcaption>0.868<br>джинсы · голубой</figcaption></figure>
+<figure><img src='../../data/catalogue/images/158674.jpg'><figcaption>0.867<br>Рубашка · розовый</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/142644.jpg'><figcaption>0.828<br>Брюки · синий, оранжевый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/277330.jpg'><figcaption>0.820<br>Брюки · желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/370377.jpg'><figcaption>0.810<br>Брюки · фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/194538.jpg'><figcaption>0.810<br>Брюки · оранжевый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/104820.jpg'><figcaption>0.800<br>футболка · голубой</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/247902.jpg'><figcaption>0.888<br>Широкие брюки · красный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/142644.jpg'><figcaption>0.860<br>Брюки · синий, оранжевый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/328683.jpg'><figcaption>0.859<br>брюки · белый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/258276.jpg'><figcaption>0.859<br>широкие брюки · белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/305037.jpg'><figcaption>0.855<br>джинсы · синий</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000003.jpg'><figcaption><b>query 3</b><br>Пудра · черный, зеленый, белый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/241267.jpg'><figcaption>0.781<br>Компактный тональный крем · белый, красный, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/114836.jpg'><figcaption>0.779<br>Тональная основа · черный, белый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/266487.jpg'><figcaption>0.774<br>Бронзер · коричневый, зеленый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/258571.jpg'><figcaption>0.773<br>рассыпчатая пудра · зеленый, черный, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/244054.jpg'><figcaption>0.765<br>пудра · розовый, белый</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/114836.jpg'><figcaption>0.710<br>Тональная основа · черный, белый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/241267.jpg'><figcaption>0.669<br>Компактный тональный крем · белый, красный, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/258571.jpg'><figcaption>0.621<br>рассыпчатая пудра · зеленый, черный, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/207844.jpg'><figcaption>0.617<br>пудра для макияжа · белый, красный, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/339625.jpg'><figcaption>0.615<br>Компактная пудра · черный, зеленый, зеленый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/114836.jpg'><figcaption>0.736<br>Тональная основа · черный, белый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/241267.jpg'><figcaption>0.733<br>Компактный тональный крем · белый, красный, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/226047.jpg'><figcaption>0.694<br>Косметическая пудра · коричневый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/081218.jpg'><figcaption>0.681<br>Компактная пудра · белый, другой</figcaption></figure>
+<figure><img src='../../data/catalogue/images/226071.jpg'><figcaption>0.676<br>Компактная пудра · черный, белый, коричневый</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000004.jpg'><figcaption><b>query 4</b><br>брюки · зеленый, белый, белый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/180827.jpg'><figcaption>0.904<br>Брюки · зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/293924.jpg'><figcaption>0.902<br>топ · зеленый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/177206.jpg'><figcaption>0.900<br>Карго штаны · синий, зеленый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/220186.jpg'><figcaption>0.900<br>Спортивные штаны · черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/080756.jpg'><figcaption>0.899<br>спортивные брюки · зеленый, серый</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/093472.jpg'><figcaption>0.856<br>тактические брюки · зеленый, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/211448.jpg'><figcaption>0.854<br>карго-брюки · зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/299812.jpg'><figcaption>0.853<br>Карго-штаны · зеленый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/120147.jpg'><figcaption>0.849<br>Брюки · зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/098554.jpg'><figcaption>0.842<br>брюки · зеленый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/359827.jpg'><figcaption>0.878<br>Брюки · серый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/093472.jpg'><figcaption>0.866<br>тактические брюки · зеленый, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/338612.jpg'><figcaption>0.865<br>брюки · белый, белый, белый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/374894.jpg'><figcaption>0.864<br>джоггеры · белый, белый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/154780.jpg'><figcaption>0.860<br>брюки · белый, белый, белый</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000005.jpg'><figcaption><b>query 5</b><br>боксеры · синий, зеленый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/294096.jpg'><figcaption>0.904<br>боксёры · желтый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/288804.jpg'><figcaption>0.891<br>плавки · синий, зеленый, красный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/217664.jpg'><figcaption>0.888<br>трусы-слипы · зеленый, желтый, оранжевый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/163451.jpg'><figcaption>0.864<br>Трусики · синий, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/156797.jpg'><figcaption>0.861<br>Трусики черные с цветочным принтом · черный</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/294096.jpg'><figcaption>0.926<br>боксёры · желтый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/200312.jpg'><figcaption>0.852<br>боксёры · красный, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/249738.jpg'><figcaption>0.824<br>боксеры · белый, красный, желтый, голубой</figcaption></figure>
+<figure><img src='../../data/catalogue/images/288804.jpg'><figcaption>0.812<br>плавки · синий, зеленый, красный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/224229.jpg'><figcaption>0.809<br>боксеры · красный, черный</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/294096.jpg'><figcaption>0.922<br>боксёры · желтый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/200312.jpg'><figcaption>0.831<br>боксёры · красный, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/288804.jpg'><figcaption>0.804<br>плавки · синий, зеленый, красный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/163451.jpg'><figcaption>0.794<br>Трусики · синий, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/249738.jpg'><figcaption>0.790<br>боксеры · белый, красный, желтый, голубой</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000006.jpg'><figcaption><b>query 6</b><br>брюки · черный, синий</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/301223.jpg'><figcaption>0.969<br>брюки · черный, синий, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/131600.jpg'><figcaption>0.967<br>Брюки · синий, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/333801.jpg'><figcaption>0.967<br>Брюки · синий</figcaption></figure>
+<figure><img src='../../data/catalogue/images/139825.jpg'><figcaption>0.966<br>брюки · черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/104429.jpg'><figcaption>0.966<br>Брюки · черный</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/301223.jpg'><figcaption>0.923<br>брюки · черный, синий, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/145847.jpg'><figcaption>0.920<br>брюки · синий</figcaption></figure>
+<figure><img src='../../data/catalogue/images/122730.jpg'><figcaption>0.918<br>Брюки · синий</figcaption></figure>
+<figure><img src='../../data/catalogue/images/082920.jpg'><figcaption>0.918<br>брюки · синий</figcaption></figure>
+<figure><img src='../../data/catalogue/images/306118.jpg'><figcaption>0.916<br>Рубашка · розовый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/298938.jpg'><figcaption>0.972<br>Рубашка · белый, голубой</figcaption></figure>
+<figure><img src='../../data/catalogue/images/351368.jpg'><figcaption>0.963<br>Брюки · синий</figcaption></figure>
+<figure><img src='../../data/catalogue/images/344917.jpg'><figcaption>0.962<br>Брюки · синий</figcaption></figure>
+<figure><img src='../../data/catalogue/images/275945.jpg'><figcaption>0.961<br>брюки · черный, синий</figcaption></figure>
+<figure><img src='../../data/catalogue/images/139825.jpg'><figcaption>0.956<br>брюки · черный</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000007.jpg'><figcaption><b>query 7</b><br>настольная лампа · черный, белый, коричневый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/373627.jpg'><figcaption>0.944<br>настольная лампа · черный, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/375139.jpg'><figcaption>0.933<br>лампа · черный, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/291990.jpg'><figcaption>0.933<br>Настольная лампа · белый, коричневый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/194203.jpg'><figcaption>0.931<br>настольная лампа · черный, белый, коричневый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/108020.jpg'><figcaption>0.929<br>настольная лампа · красный, черный</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/373627.jpg'><figcaption>0.948<br>настольная лампа · черный, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/108020.jpg'><figcaption>0.917<br>настольная лампа · красный, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/173237.jpg'><figcaption>0.889<br>настольная лампа · черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/259473.jpg'><figcaption>0.878<br>настольная лампа · черный, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/375139.jpg'><figcaption>0.875<br>лампа · черный, белый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/373627.jpg'><figcaption>0.978<br>настольная лампа · черный, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/108020.jpg'><figcaption>0.932<br>настольная лампа · красный, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/173237.jpg'><figcaption>0.929<br>настольная лампа · черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/107051.jpg'><figcaption>0.928<br>лампа · черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/371390.jpg'><figcaption>0.920<br>настольная лампа · черный, белый</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000008.jpg'><figcaption><b>query 8</b><br>футболка · серый, белый, розовый, желтый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/305060.jpg'><figcaption>0.841<br>футболка · синий, фиолетовый, красный, желтый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/247932.jpg'><figcaption>0.841<br>футболка · серый, розовый, красный, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/329246.jpg'><figcaption>0.837<br>футболка · белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/102760.jpg'><figcaption>0.836<br>Футболка · розовый, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/172813.jpg'><figcaption>0.834<br>топ · зеленый</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/382088.jpg'><figcaption>0.715<br>футболка · белый, синий, красный, зеленый, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/173728.jpg'><figcaption>0.696<br>Футболка · розовый, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/268475.jpg'><figcaption>0.695<br>футболка · розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/244767.jpg'><figcaption>0.686<br>Футболка · серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/268677.jpg'><figcaption>0.681<br>Футболка · розовый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/173728.jpg'><figcaption>0.782<br>Футболка · розовый, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/209143.jpg'><figcaption>0.769<br>футболка · розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/344615.jpg'><figcaption>0.758<br>футболка · серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/305060.jpg'><figcaption>0.756<br>футболка · синий, фиолетовый, красный, желтый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/268475.jpg'><figcaption>0.752<br>футболка · розовый</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000009.jpg'><figcaption><b>query 9</b><br>Сари · синий, зеленый, зеленый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/152185.jpg'><figcaption>0.914<br>Сари · розовый, белый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/095018.jpg'><figcaption>0.911<br>Сари · синий, фиолетовый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/350787.jpg'><figcaption>0.908<br>Сари · синий, коричневый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/320388.jpg'><figcaption>0.907<br>Сари · розовый, белый, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/115545.jpg'><figcaption>0.907<br>Сари · оранжевый, красный</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/117999.jpg'><figcaption>0.880<br>Сари · синий, зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/273783.jpg'><figcaption>0.878<br>Сари · серый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/323868.jpg'><figcaption>0.876<br>сари · коричневый, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/152031.jpg'><figcaption>0.867<br>сари · фиолетовый, коричневый, зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/287619.jpg'><figcaption>0.866<br>сарi · синий, зеленый, зеленый, зеленый, зеленый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/323868.jpg'><figcaption>0.923<br>сари · коричневый, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/100167.jpg'><figcaption>0.915<br>Сари · фиолетовый, белый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/350787.jpg'><figcaption>0.914<br>Сари · синий, коричневый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/190575.jpg'><figcaption>0.914<br>Сари · голубой, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/165061.jpg'><figcaption>0.904<br>сари · синий, фиолетовый</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000010.jpg'><figcaption><b>query 10</b><br>брюки · зеленый, черный</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/292666.jpg'><figcaption>0.980<br>Брюки · черный, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/348670.jpg'><figcaption>0.972<br>брюки · синий, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/214096.jpg'><figcaption>0.970<br>брюки · черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/237445.jpg'><figcaption>0.969<br>брюки · черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/290871.jpg'><figcaption>0.967<br>Брюки · серый</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/292666.jpg'><figcaption>0.982<br>Брюки · черный, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/125537.jpg'><figcaption>0.948<br>брюки · зеленый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/163014.jpg'><figcaption>0.944<br>брюки · серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/121339.jpg'><figcaption>0.931<br>Брюки · серый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/337583.jpg'><figcaption>0.926<br>Брюки · серый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/292666.jpg'><figcaption>0.990<br>Брюки · черный, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/125537.jpg'><figcaption>0.964<br>брюки · зеленый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/280018.jpg'><figcaption>0.950<br>Брюки · зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/265739.jpg'><figcaption>0.950<br>брюки · коричневый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/379970.jpg'><figcaption>0.947<br>брюки · серый</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000011.jpg'><figcaption><b>query 11</b><br>трусики · серый, зеленый, синий</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/354649.jpg'><figcaption>0.960<br>плавки · черный, белый, белый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/348563.jpg'><figcaption>0.959<br>женские трусы · розовый, черный, синий, синий, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/250865.jpg'><figcaption>0.959<br>Трусы · синий, розовый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/315601.jpg'><figcaption>0.957<br>Трусики · серый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/313647.jpg'><figcaption>0.955<br>Трусы · белый, розовый, другой</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/302857.jpg'><figcaption>0.904<br>нижнее белье · синий, серый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/146613.jpg'><figcaption>0.891<br>трусики · белый, черный, красный, оранжевый, желтый, зеленый, синий, фиолетовый, розовый, коричневый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/121505.jpg'><figcaption>0.890<br>Трусики · розовый, белый, синий, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/321757.jpg'><figcaption>0.887<br>трусы · фиолетовый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/250865.jpg'><figcaption>0.882<br>Трусы · синий, розовый, белый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/302857.jpg'><figcaption>0.936<br>нижнее белье · синий, серый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/121505.jpg'><figcaption>0.922<br>Трусики · розовый, белый, синий, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/289918.jpg'><figcaption>0.919<br>Трусы · синий, красный, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/354649.jpg'><figcaption>0.911<br>плавки · черный, белый, белый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/369397.jpg'><figcaption>0.904<br>Трусики · серый, розовый, голубой</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000012.jpg'><figcaption><b>query 12</b><br>сари · синий, красный, зеленый, зеленый, белый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/325257.jpg'><figcaption>0.963<br>Сари · зеленый, зеленый, зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/256049.jpg'><figcaption>0.960<br>Сари · зеленый, зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/107451.jpg'><figcaption>0.959<br>Сари · зеленый, зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/230834.jpg'><figcaption>0.959<br>Сари · белый, зеленый, зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/305890.jpg'><figcaption>0.958<br>Сари · зеленый, зеленый, зеленый, зеленый, зеленый, зеленый</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/328559.jpg'><figcaption>0.919<br>сари · белый, зеленый, красный, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/230834.jpg'><figcaption>0.916<br>Сари · белый, зеленый, зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/255480.jpg'><figcaption>0.911<br>сари · синий, зеленый, фиолетовый, зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/093272.jpg'><figcaption>0.910<br>Сари · зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/193003.jpg'><figcaption>0.910<br>сари · голубой, зеленый, зеленый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/085677.jpg'><figcaption>0.953<br>саре · зеленый, розовый, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/117202.jpg'><figcaption>0.944<br>Сари · белый, зеленый, розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/093272.jpg'><figcaption>0.943<br>Сари · зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/367438.jpg'><figcaption>0.943<br>сари · синий, розовый, зеленый, черный, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/230878.jpg'><figcaption>0.941<br>сари · голубой, розовый, зеленый, зеленый, зеленый, красный</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000013.jpg'><figcaption><b>query 13</b><br>Сумка · белый, зеленый, розовый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/128113.jpg'><figcaption>0.952<br>сумка · голубой, розовый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/339346.jpg'><figcaption>0.948<br>Сумка · белый, розовый, голубой</figcaption></figure>
+<figure><img src='../../data/catalogue/images/349802.jpg'><figcaption>0.942<br>Сумка · красный, голубой, белый, оранжевый, розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/152872.jpg'><figcaption>0.931<br>Сумка · серый, коричневый, белый, розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/160409.jpg'><figcaption>0.929<br>Сумка · зеленый, белый, голубой</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/276735.jpg'><figcaption>0.887<br>Сумка · белый, красный, голубой, зеленый, фиолетовый, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/128113.jpg'><figcaption>0.875<br>сумка · голубой, розовый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/349802.jpg'><figcaption>0.871<br>Сумка · красный, голубой, белый, оранжевый, розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/251970.jpg'><figcaption>0.864<br>Сумка · белый, зеленый, красный, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/092117.jpg'><figcaption>0.851<br>Сумка · белый, розовый, зеленый, фиолетовый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/276735.jpg'><figcaption>0.925<br>Сумка · белый, красный, голубой, зеленый, фиолетовый, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/092117.jpg'><figcaption>0.924<br>Сумка · белый, розовый, зеленый, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/128113.jpg'><figcaption>0.922<br>сумка · голубой, розовый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/349802.jpg'><figcaption>0.914<br>Сумка · красный, голубой, белый, оранжевый, розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/251970.jpg'><figcaption>0.912<br>Сумка · белый, зеленый, красный, желтый</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000014.jpg'><figcaption><b>query 14</b><br>Спортивные брюки · серый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/214260.jpg'><figcaption>0.965<br>Спортивные брюки · серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/328538.jpg'><figcaption>0.958<br>Спортивные брюки · черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/238879.jpg'><figcaption>0.954<br>Спортивные брюки · черный, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/183219.jpg'><figcaption>0.952<br>спортивные штаны · черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/296061.jpg'><figcaption>0.951<br>Спортивные брюки · серый</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/296061.jpg'><figcaption>0.828<br>Спортивные брюки · серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/214260.jpg'><figcaption>0.823<br>Спортивные брюки · серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/131498.jpg'><figcaption>0.815<br>Спортивные брюки · серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/200156.jpg'><figcaption>0.814<br>Спортивные брюки · серый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/328538.jpg'><figcaption>0.809<br>Спортивные брюки · черный</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/200156.jpg'><figcaption>0.912<br>Спортивные брюки · серый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/328538.jpg'><figcaption>0.912<br>Спортивные брюки · черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/214260.jpg'><figcaption>0.909<br>Спортивные брюки · серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/296061.jpg'><figcaption>0.906<br>Спортивные брюки · серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/131498.jpg'><figcaption>0.879<br>Спортивные брюки · серый</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000015.jpg'><figcaption><b>query 15</b><br>Курта · красный, желтый, серый, белый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/297599.jpg'><figcaption>0.885<br>блузка · белый, розовый, оранжевый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/350694.jpg'><figcaption>0.878<br>платье · оранжевый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/186479.jpg'><figcaption>0.875<br>одежда · оранжевый, красный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/118129.jpg'><figcaption>0.873<br>платье · белый, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/276403.jpg'><figcaption>0.873<br>ткань · белый, красный, зеленый, зеленый</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/086162.jpg'><figcaption>0.821<br>Сари · зеленый, красный, зеленый, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/258651.jpg'><figcaption>0.813<br>сари · красный, оранжевый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/261584.jpg'><figcaption>0.813<br>Сари · красный, оранжевый, зеленый, зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/203867.jpg'><figcaption>0.812<br>Сари · оранжевый, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/341062.jpg'><figcaption>0.810<br>сари · желтый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/194744.jpg'><figcaption>0.927<br>блуза · красный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/302071.jpg'><figcaption>0.920<br>сумочка · желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/260255.jpg'><figcaption>0.917<br>Сари · красный, оранжевый, желтый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/091199.jpg'><figcaption>0.914<br>Платье · красный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/249087.jpg'><figcaption>0.914<br>сари · красный, зеленый, зеленый, зеленый</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000016.jpg'><figcaption><b>query 16</b><br>Кровать · белый, серый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/296381.jpg'><figcaption>0.980<br>кровать · белый, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/227411.jpg'><figcaption>0.979<br>кровать · белый, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/191015.jpg'><figcaption>0.975<br>кровать · серый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/310726.jpg'><figcaption>0.973<br>кровать · белый, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/277596.jpg'><figcaption>0.970<br>кровать · белый, серый</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/191015.jpg'><figcaption>0.993<br>кровать · серый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/227411.jpg'><figcaption>0.963<br>кровать · белый, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/310726.jpg'><figcaption>0.955<br>кровать · белый, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/277596.jpg'><figcaption>0.950<br>кровать · белый, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/296381.jpg'><figcaption>0.942<br>кровать · белый, серый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/191015.jpg'><figcaption>0.991<br>кровать · серый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/277596.jpg'><figcaption>0.965<br>кровать · белый, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/296381.jpg'><figcaption>0.965<br>кровать · белый, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/227411.jpg'><figcaption>0.962<br>кровать · белый, серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/310726.jpg'><figcaption>0.954<br>кровать · белый, серый</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000017.jpg'><figcaption><b>query 17</b><br>футболка · серый</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/156617.jpg'><figcaption>0.693<br>Маска для лица · розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/109117.jpg'><figcaption>0.686<br>Футболка · красный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/144766.jpg'><figcaption>0.685<br>Футболка с принтом · синий, голубой</figcaption></figure>
+<figure><img src='../../data/catalogue/images/243314.jpg'><figcaption>0.680<br>свитшот · зеленый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/170473.jpg'><figcaption>0.679<br>футболка · синий</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/178755.jpg'><figcaption>0.673<br>футболка · синий, желтый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/265197.jpg'><figcaption>0.651<br>футболка · оранжевый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/190816.jpg'><figcaption>0.633<br>футболка · синий, оранжевый, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/291829.jpg'><figcaption>0.627<br>футболка · серый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/217718.jpg'><figcaption>0.624<br>футболка · серый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/217718.jpg'><figcaption>0.772<br>футболка · серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/125653.jpg'><figcaption>0.765<br>Футболка · серый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/178755.jpg'><figcaption>0.760<br>футболка · синий, желтый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/265197.jpg'><figcaption>0.749<br>футболка · оранжевый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/193810.jpg'><figcaption>0.749<br>футболка · зеленый, оранжевый, желтый, черный</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000018.jpg'><figcaption><b>query 18</b><br>Футболка · белый, голубой, красный</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/254515.jpg'><figcaption>0.912<br>футболка · белый, желтый, синий, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/311493.jpg'><figcaption>0.910<br>футболка · серый, красный, синий, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/118355.jpg'><figcaption>0.874<br>футболка · белый, серый, черный, красный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/182858.jpg'><figcaption>0.871<br>футболка · синий, красный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/202651.jpg'><figcaption>0.868<br>футболка · зеленый, оранжевый, серый, синий</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/254515.jpg'><figcaption>0.838<br>футболка · белый, желтый, синий, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/112641.jpg'><figcaption>0.791<br>футболка · белый, оранжевый, коричневый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/353505.jpg'><figcaption>0.779<br>футболка · белый, зеленый, розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/131258.jpg'><figcaption>0.776<br>футболка · розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/281508.jpg'><figcaption>0.775<br>Футболка · белый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/347113.jpg'><figcaption>0.870<br>футболка · серый, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/254515.jpg'><figcaption>0.858<br>футболка · белый, желтый, синий, черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/344173.jpg'><figcaption>0.823<br>футболка · белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/317674.jpg'><figcaption>0.822<br>Футболка · белый, синий</figcaption></figure>
+<figure><img src='../../data/catalogue/images/332948.jpg'><figcaption>0.819<br>футболка · белый, голубой</figcaption></figure>
+</div>
+</div>
+<div class='q'>
+<div class='strip query'><figure><img src='../../data/queries/images/000019.jpg'><figcaption><b>query 19</b><br>Тушь для ресниц · черный</figcaption></figure></div>
+<h2>clip-vit-b32</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/142223.jpg'><figcaption>0.923<br>губная помада · розовый, красный, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/150615.jpg'><figcaption>0.920<br>губная помада · розовый, красный, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/194089.jpg'><figcaption>0.912<br>Помада · розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/298641.jpg'><figcaption>0.909<br>карандаш для макияжа глаз · черный</figcaption></figure>
+<figure><img src='../../data/catalogue/images/378307.jpg'><figcaption>0.907<br>Помада · розовый, коричневый</figcaption></figure>
+</div>
+<h2>marqo-fashionclip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/142223.jpg'><figcaption>0.797<br>губная помада · розовый, красный, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/266167.jpg'><figcaption>0.793<br>Тональный крем · белый, красный, оранжевый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/142674.jpg'><figcaption>0.759<br>Карандаш для губ · розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/297693.jpg'><figcaption>0.748<br>губная помада · розовый, красный, коричневый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/367503.jpg'><figcaption>0.747<br>губная помада 1 · красный, белый, коричневый</figcaption></figure>
+</div>
+<h2>marqo-fashionsiglip</h2><div class='strip'>
+<figure><img src='../../data/catalogue/images/142674.jpg'><figcaption>0.836<br>Карандаш для губ · розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/142223.jpg'><figcaption>0.825<br>губная помада · розовый, красный, фиолетовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/378201.jpg'><figcaption>0.799<br>Карандаш для губ · красный, белый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/254129.jpg'><figcaption>0.790<br>Помада · розовый</figcaption></figure>
+<figure><img src='../../data/catalogue/images/144282.jpg'><figcaption>0.789<br>Карандаш для глаз Power Stay · черный</figcaption></figure>
+</div>
+</div>
